@@ -1,0 +1,215 @@
+Frontend------------------------(client)
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+npm install react-scroll
+npm install react-icons
+npm install framer-motion
+npm install lucide-react
+
+
+Backend---------------(server)
+cd MediVault
+mkdir server
+cd server
+npm init -y
+npm install express mongoose cors dotenv bcryptjs jsonwebtoken otp-generator
+npm install nodemon --save-dev
+npm install express mongoose dotenv jsonwebtoken nodemailer
+
+
+We’ve completed the backend logic for Swasthya Setu (MediVault) using Node.js, Express, and MongoDB. The current system handles OTP-based login (request & verify), JWT issuance, and role-based user creation (patient/hospital/ngo). 
+
+We’ve modularized the backend into models, routes, controllers, and utils. OTPs are generated, stored with expiration, and verified with proper error handling. JWT tokens are issued after successful OTP verification.
+
+Still need to add `aadhaar` and `otp` fields to the User schema and connect this logic to the React frontend's login/signup modal via `/api/auth/request-otp` and `/api/auth/verify-otp`.
+
+Ready to move to frontend integration.
+
+  // ✅ Fallback OTP route (optional, not needed if check-mode is used)
+  // app.post("/request-otp", async (req, res) => {
+  //   const { phoneNumber, aadhaar } = req.body;
+
+  //   if (!phoneNumber || !aadhaar) {
+  //     return res.status(400).json({ msg: "Phone and Aadhaar required" });
+  //   }
+
+  //   const otp = crypto.randomInt(100000, 999999).toString();
+
+  //   try {
+  //     await OTP.deleteMany({ phoneNumber });
+  //     await OTP.create({ phoneNumber, aadhaar, otp });
+  //     console.log(`📨 OTP (manual) ${otp} sent to ${phoneNumber}`);
+  //     res.status(200).json({ msg: "OTP sent successfully" });
+  //   } catch (err) {
+  //     console.error("❌ OTP error:", err);
+  //     res.status(500).json({ msg: "Failed to send OTP" });
+  //   }
+  // });
+
+  const express = require("express");
+  const cors = require("cors");
+  const mongoose = require("mongoose");
+  const dotenv = require("dotenv");
+  const bodyParser = require("body-parser");
+  const crypto = require("crypto");
+
+  dotenv.config();
+  const app = express();
+  app.use(cors());
+  app.use(bodyParser.json());
+
+  // ✅ MongoDB connection
+  mongoose
+    .connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(() => console.log("✅ MongoDB connected"))
+    .catch((err) => console.error("❌ MongoDB connection error:", err));
+
+  // ✅ User Schema
+  const userSchema = new mongoose.Schema({
+    name: String,
+    phoneNumber: { type: String, required: true },
+    aadhaar: { type: String, required: true },
+    dob: String,
+    role: { type: String, default: "patient" },
+  });
+  const User = mongoose.model("User", userSchema);
+
+  // ✅ OTP Schema
+  const otpSchema = new mongoose.Schema({
+    phoneNumber: String,
+    aadhaar: String,
+    otp: String,
+    createdAt: { type: Date, default: Date.now, expires: 300 }, // 5 mins
+  });
+  const OTP = mongoose.model("OTP", otpSchema);
+
+  // ✅ /check-mode — handles both sign_in & sign_up pre-checks
+  app.post("/check-mode", async (req, res) => {
+    const { name, phoneNumber, aadhaar, dob, mode } = req.body;
+
+    if (!phoneNumber || !aadhaar || !mode) {
+      return res.status(400).json({ msg: "Phone, Aadhaar & mode are required" });
+    }
+
+    if (!/^\d{10}$/.test(phoneNumber)) {
+      return res.status(400).json({ msg: "Phone must be 10 digits" });
+    }
+
+    if (!/^\d{12}$/.test(aadhaar)) {
+      return res.status(400).json({ msg: "Aadhaar must be 12 digits" });
+    }
+
+    try {
+      const existingUser = await User.findOne({ phoneNumber, aadhaar });
+
+      if (mode === "sign_in") {
+        if (!existingUser) {
+          return res.status(404).json({ exists: false, msg: "User not found" });
+        }
+
+        // Send OTP
+        const otp = crypto.randomInt(100000, 999999).toString();
+        await OTP.deleteMany({ phoneNumber });
+        await OTP.create({ phoneNumber, aadhaar, otp });
+        console.log(`📨 OTP for login ${otp} to ${phoneNumber}`);
+
+        return res.status(200).json({ exists: true, msg: "OTP sent successfully" });
+      }
+
+      if (mode === "sign_up") {
+        if (existingUser) {
+          return res.status(409).json({ exists: true, msg: "User already exists" });
+        }
+
+      if (!name || !phoneNumber || !aadhaar) {
+        console.log("BODY RECEIVED:", req.body);
+        return res.status(400).json({ msg: "All signup fields required" });
+      }
+
+
+
+        // Send OTP
+        const otp = crypto.randomInt(100000, 999999).toString();
+        await OTP.deleteMany({ phoneNumber });
+        await OTP.create({ phoneNumber, aadhaar, otp });
+        console.log(`📨 OTP for signup ${otp} to ${phoneNumber}`)
+
+        return res.status(200).json({ exists: false, msg: "OTP sent successfully" });
+      }
+
+      return res.status(400).json({ msg: "Invalid mode" });
+    } catch (err) {
+      console.error("❌ check-mode error:", err);
+      res.status(500).json({ msg: "Server error" });
+    }
+  });
+
+
+  // ✅ Verify OTP
+  app.post("/verify-otp", async (req, res) => {
+    const { phoneNumber, aadhaar, otp, name, dob, mode } = req.body;
+
+    if (!phoneNumber || !aadhaar || !otp || !mode) {
+      return res.status(400).json({ msg: "Missing required fields" });
+    }
+
+    try {
+      const match = await OTP.findOne({ phoneNumber, otp });
+      if (!match) {
+        return res.status(400).json({ msg: "Invalid or expired OTP" });
+      }
+
+      await OTP.deleteMany({ phoneNumber }); // Cleanup
+
+      if (mode === "sign_up") {
+        const exists = await User.findOne({ phoneNumber, aadhaar });
+        if (exists) {
+          return res.status(409).json({ msg: "User already exists" });
+        }
+
+        const newUser = new User({ name, phoneNumber, aadhaar, dob });
+        await newUser.save();
+        return res.status(201).json({ success: true, msg: "Signup successful" });
+      }
+
+      if (mode === "sign_in") {
+        const user = await User.findOne({ phoneNumber, aadhaar });
+        if (!user) {
+          return res.status(404).json({ msg: "User not found" });
+        }
+
+        return res.status(200).json({ success: true, msg: "Login successful" });
+      }
+
+      return res.status(400).json({ msg: "Invalid mode" });
+    } catch (err) {
+      console.error("❌ Verify OTP error:", err);
+      res.status(500).json({ msg: "OTP verification failed" });
+    }
+  });
+
+  // ✅ Start server
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+{
+  "phone": "1234567890",
+  "otp": "340741",
+  "mode": "sign_up"
+}
+
+
+
+--REMEMBER THIS_________!!
+catch (err) {
+  if (err.response) {
+    // Server responded with a status outside 2xx
+  } else if (err.request) {
+    // No response received from backend
+  } else {
+    // Other issues like request setup or JS error
+  }
+}
