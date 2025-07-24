@@ -33,7 +33,7 @@ function App() {
   return (
     <>
       <Navbar onAuthClick={handleAuthClick} />
-      <Hero />
+      <Hero onAuthClick={handleAuthClick} />
       <Stats />
       <About />
       <Features />

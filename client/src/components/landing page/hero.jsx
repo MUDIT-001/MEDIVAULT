@@ -1,5 +1,5 @@
 // src/components/Hero.jsx
-const Hero = () => {
+const Hero = ({ onAuthClick }) => {
   return (
     <section
       id="home"
@@ -20,10 +20,12 @@ const Hero = () => {
           </p>
 
           <div className="flex gap-4">
-            <button className="bg-black text-white px-5 py-2 rounded-full hover:bg-[#333] transition">
+            <button className="bg-black text-white px-5 py-2 rounded-full hover:bg-[#333] transition"
+              onClick={() => onAuthClick("login", "patient")}>
               Donate Supplies
             </button>
-            <button className="border-2 border-black px-5 py-2 rounded-full text-black hover:bg-[#0000000c] transition">
+            <button className="border-2 border-black px-5 py-2 rounded-full text-black hover:bg-[#0000000c] transition"
+              onClick={() => onAuthClick("login", "patient")}>
               Access Records
             </button>
           </div>
