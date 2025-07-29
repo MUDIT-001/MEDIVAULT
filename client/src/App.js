@@ -16,6 +16,7 @@ import ScrollToTop from "./components/landing page/scrolltotop";
 import SignupModal from "./components/auth/sign_up";
 import LoginModal from "./components/auth/sign_in";
 import OTPModal from "./components/auth/otpmodel";
+import UserDashboard from "./components/user dashboard/combined";
 
 function App() {
   const [authModal, setAuthModal] = useState({ type: null, role: null });
@@ -40,7 +41,6 @@ function App() {
       <CTA onAuthClick={handleAuthClick} />
       <Footer />
       <ScrollToTop />
-
       <ToastContainer position="top-center" autoClose={2000} theme="colored" />
 
       {authModal.type === "sign_up" && authModal.role === "patient" && (
