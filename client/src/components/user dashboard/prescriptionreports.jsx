@@ -1,131 +1,174 @@
 import React, { useState } from "react";
 import { FaDownload, FaTrash, FaEye } from "react-icons/fa";
-import { FiTag, FiCalendar } from "react-icons/fi";
 
-const dummyData = [
-  {
-    name: "Blood Test Results - Complete Panel",
-    date: "Jan 15, 2025",
-    size: "2.4 MB",
-    tags: ["#BloodTest", "#Lab", "#Routine"],
-  },
-  {
-    name: "Cardiology Consultation Notes",
-    date: "Jan 8, 2025",
-    size: "0.9 MB",
-    tags: ["#Cardiology", "#Consultation", "#Heart"],
-  },
-  {
-    name: "Chest X-Ray Report",
-    date: "Jan 10, 2025",
-    size: "5.8 MB",
-    tags: ["#XRay", "#Imaging", "#Chest"],
-  },
-  {
-    name: "Diabetes Medication Prescription",
-    date: "Dec 28, 2024",
-    size: "0.7 MB",
-    tags: ["#Diabetes", "#Prescription", "#Metformin"],
-  },
-  {
-    name: "Malaria Treatment Prescription",
-    date: "Jan 12, 2025",
-    size: "1.2 MB",
-    tags: ["#Malaria", "#Prescription", "#Antimalarial"],
-  },
-  {
-    name: "MRI Brain Scan",
-    date: "Dec 25, 2024",
-    size: "12.3 MB",
-    tags: ["#MRI", "#Brain", "#Imaging"],
-  },
-];
+const PrescriptionReports = () => {
+  const [documents, setDocuments] = useState([
+    {
+      id: 1,
+      name: "Blood Test Results - Complete Panel",
+      date: new Date("2025-01-15"),
+      size: "2.4 MB",
+      tags: ["#BloodTest", "#Lab", "#Routine"],
+    },
+    {
+      id: 2,
+      name: "Cardiology Consultation Notes",
+      date: new Date("2025-01-08"),
+      size: "0.9 MB",
+      tags: ["#Cardiology", "#Consultation", "#Heart"],
+    },
+    {
+      id: 3,
+      name: "Chest X-Ray Report",
+      date: new Date("2025-01-10"),
+      size: "5.8 MB",
+      tags: ["#XRay", "#Imaging", "#Chest"],
+    },
+    {
+      id: 4,
+      name: "Diabetes Medication Prescription",
+      date: new Date("2024-12-28"),
+      size: "0.7 MB",
+      tags: ["#Diabetes", "#Prescription", "#Metformin"],
+    },
+    {
+      id: 5,
+      name: "Malaria Treatment Prescription",
+      date: new Date("2025-01-12"),
+      size: "1.2 MB",
+      tags: ["#Malaria", "#Prescription", "#Antimalarial"],
+    },
+    {
+      id: 6,
+      name: "MRI Brain Scan",
+      date: new Date("2024-12-25"),
+      size: "12.3 MB",
+      tags: ["#MRI", "#Brain", "#Imaging"],
+    },
+  ]);
 
-const PrescriptionReports = ({ onBack }) => {
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("newest");
 
-  const filteredData = dummyData.filter((doc) =>
-    doc.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const handleUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const tag = prompt("Enter tags for this document (comma separated):") || "General";
+    const newDoc = {
+      id: Date.now(),
+      name: file.name,
+      date: new Date(),
+      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+      tags: tag.split(",").map((t) => `#${t.trim()}`),
+      file,
+    };
+    setDocuments((prev) => [...prev, newDoc]);
+  };
+
+  const handleDelete = (id) => {
+    setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+  };
+
+  const handleDownload = (file) => {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleView = (file) => {
+    const url = URL.createObjectURL(file);
+    window.open(url, "_blank");
+  };
+
+  const filteredDocs = documents
+    .filter((doc) =>
+      doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => {
+      switch (sortOption) {
+        case "atoz":
+          return a.name.localeCompare(b.name);
+        case "ztoa":
+          return b.name.localeCompare(a.name);
+        case "oldest":
+          return a.date - b.date;
+        default:
+          return b.date - a.date;
+      }
+    });
 
   return (
-    <div className="w-full px-6 py-6">
-      {/* Back Button */}
+    <div className="p-6 w-full">
+      <h2 className="text-2xl font-bold mb-4">Prescriptions & Reports</h2>
 
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-semibold">Prescriptions & Records</h2>
-          <p className="text-gray-500">
-            Manage your medical documents with tags and filters
-          </p>
-        </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-          Upload Document
-        </button>
-      </div>
-
-      {/* Search & Filters */}
-      <div className="flex flex-wrap gap-3 mb-4 items-center">
+      <div className="flex flex-wrap gap-4 mb-6 items-center">
+        <input
+          type="file"
+          onChange={handleUpload}
+          className="file-input file-input-bordered file-input-primary"
+        />
         <input
           type="text"
-          placeholder="Search documents and tags..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 p-2 border rounded w-full md:w-auto"
+          placeholder="Search by name or tag..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="input input-bordered"
         />
-        <button className="flex items-center gap-1 border px-3 py-2 rounded text-sm">
-          <FiTag /> Tags
-        </button>
-        <button className="flex items-center gap-1 border px-3 py-2 rounded text-sm">
-          <FiCalendar /> Date Range
-        </button>
-        <select className="border p-2 rounded text-sm">
-          <option>A-Z</option>
-          <option>Z-A</option>
-          <option>Newest</option>
-          <option>Oldest</option>
+        <select
+          className="select select-bordered"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="atoz">A-Z</option>
+          <option value="ztoa">Z-A</option>
         </select>
       </div>
 
-      {/* Document Count */}
-      <p className="mb-4 text-gray-500">
-        Showing {filteredData.length} of {dummyData.length} documents
-      </p>
-
-      {/* Document Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {filteredData.map((doc, idx) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {filteredDocs.map((doc) => (
           <div
-            key={idx}
-            className="bg-white border rounded-xl shadow-sm p-4 flex flex-col justify-between"
+            key={doc.id}
+            className="bg-white border rounded-xl p-4 shadow flex flex-col justify-between"
           >
-            <div className="mb-2">
-              <h3 className="font-semibold text-md">{doc.name}</h3>
-              <p className="text-sm text-gray-500">
-                {doc.date} • {doc.size}
+            <div>
+              <h3 className="text-lg font-semibold truncate mb-1">{doc.name}</h3>
+              <p className="text-sm text-gray-500 mb-1">
+                Tags: {doc.tags.map((tag, i) => (
+                  <span key={i} className="text-blue-600 mr-2">{tag}</span>
+                ))}
+              </p>
+              <p className="text-sm text-gray-400 mb-3">
+                Uploaded: {doc.date.toLocaleDateString()} • {doc.size}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 my-2">
-              {doc.tags.map((tag, tagIdx) => (
-                <span
-                  key={tagIdx}
-                  className="bg-blue-100 text-blue-600 text-xs font-medium px-2 py-1 rounded-full"
+            {doc.file && (
+              <div className="flex justify-between items-center text-sm">
+                <button
+                  onClick={() => handleView(doc.file)}
+                  className="btn btn-sm btn-outline"
                 >
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
-              <button className="hover:text-black flex items-center gap-1">
-                <FaEye /> View
-              </button>
-              <button className="hover:text-black flex items-center gap-1">
-                <FaDownload /> Download
-              </button>
-              <button className="hover:text-red-500 flex items-center gap-1">
-                <FaTrash /> Delete
-              </button>
-            </div>
+                  <FaEye className="mr-1" /> View
+                </button>
+                <button
+                  onClick={() => handleDownload(doc.file)}
+                  className="btn btn-sm btn-outline"
+                >
+                  <FaDownload className="mr-1" /> Download
+                </button>
+                <button
+                  onClick={() => handleDelete(doc.id)}
+                  className="btn btn-sm btn-outline btn-error"
+                >
+                  <FaTrash className="mr-1" /> Delete
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

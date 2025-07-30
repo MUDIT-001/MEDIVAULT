@@ -42,7 +42,7 @@ const ProfilePage = () => {
   const handleChange = (field, value) => {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
-
+  
   const handleEmergencyChange = (field, value) => {
     setProfile(prev => ({
       ...prev,
@@ -56,7 +56,7 @@ const ProfilePage = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <img
-            src="/user-icon.png"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmbjv1b97xu6VCVRTNUYstiIY76N_gaiC9nO5tXG5KUNdBkt04m-5qHN4&s"
             alt="User"
             className="w-16 h-16 rounded-full object-cover border border-gray-300"
           />
