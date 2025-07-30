@@ -51,4 +51,5 @@ const Hero = ({ onAuthClick }) => {
   );
 };
 
-export default Hero;
+export default Hero;
+

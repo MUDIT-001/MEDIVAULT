@@ -69,7 +69,11 @@ const Navbar = ({ onAuthClick }) => {
   return (
     <nav className="fixed top-0 w-full z-50 bg-white shadow-sm font-poppins px-[120px] py-4 flex justify-between items-center">
       <div className="flex items-center gap-2">
-        <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
+       <div className="flex items-center gap-2">
+  <div className="h-[48px] flex items-center">
+    <img src="/logo1.png" alt="logo" className="h-full w-auto" />
+  </div>
+</div>
       </div>
 
       <div className="flex items-center gap-8">

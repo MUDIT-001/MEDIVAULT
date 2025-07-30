@@ -1,8 +1,9 @@
-// App.js
+// App.jsimport React from "react";
+
+
 import { useState } from "react";
-import { ToastContainer} from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-//import axios from "axios";
 
 import Navbar from "./components/landing page/navbar";
 import Hero from "./components/landing page/hero";
@@ -11,6 +12,13 @@ import About from "./components/landing page/about";
 import Features from "./components/landing page/features";
 import CTA from "./components/landing page/cta";
 import Footer from "./components/landing page/footer";
+import DonateForm from "./components/Donation/DonationForm";
+import EmailVerify from "./components/auth/emailverify";
+
+import NGOHospitalLogin from "./components/auth/signinform";
+
+import SignUpForm from "./components/auth/signupform";
+
 import ScrollToTop from "./components/landing page/scrolltotop";
 
 import SignupModal from "./components/auth/sign_up";
@@ -31,13 +39,28 @@ function App() {
   };
 
   return (
+
     <>
+    <DonateForm />
       <Navbar onAuthClick={handleAuthClick} />
       <Hero onAuthClick={handleAuthClick} />
       <Stats />
       <About />
       <Features />
       <CTA onAuthClick={handleAuthClick} />
+       <NGOHospitalLogin />
+      <SignUpForm />
+      <EmailVerify
+  onClose={() => console.log("Closed")}
+  onBack={() => console.log("Back clicked")}
+/>
+
+      
+
+
+      {/* Render the donation form directly for testing */}
+      
+
       <Footer />
       <ScrollToTop />
 
@@ -65,17 +88,16 @@ function App() {
             setShowOtpModal(true);
           }}
         />
-      )
-    }
-      {showOtpModal && (
-          <OTPModal
-            isOpen={true}
-            phone={otpPhone}
-            mode={authModal.type}
-            onClose={() => setShowOtpModal(false)}
-          />
-        )}
+      )}
 
+      {showOtpModal && (
+        <OTPModal
+          isOpen={true}
+          phone={otpPhone}
+          mode={authModal.type}
+          onClose={() => setShowOtpModal(false)}
+        />
+      )}
     </>
   );
 }

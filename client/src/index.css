@@ -18,4 +18,13 @@
 .active-link {
   color: #004AAD;
 }
+.feature-image {
+  width: 388px;
+  height: 296px;
+
+  background-color: #D9D9D9;
+  object-fit: cover;
+  border-radius: 0px; /* Optional, to match the design */
+  margin-bottom: 1rem;
+}
 
