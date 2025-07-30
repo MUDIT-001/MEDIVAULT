@@ -1,6 +1,7 @@
 import React from "react";
 
-const CTA = () => {
+const CTA = ({ onDonateClick }) => 
+ {
   return (
     <section className="bg-gradient-to-b from-[#e6edff] to-[#f2f6ff] px-[120px] py-20 font-poppins">
       <h2 className="text-4xl font-extrabold text-center mb-12 leading-tight">
@@ -42,9 +43,13 @@ const CTA = () => {
             Organizations can log in to donate resources, collaborate with NGOs,
             and support healthcare initiatives across the country.
           </p>
-          <p className="text-sm text-black font-medium underline underline-offset-4 cursor-pointer">
-            Organization Login &gt;
-          </p>
+          <button
+  onClick={onDonateClick}
+  className="text-sm text-black font-medium underline underline-offset-4 cursor-pointer"
+>
+  Donate Supplies &gt;
+</button>
+
         </div>
 
         {/* Community Card */}
@@ -71,3 +76,4 @@ const CTA = () => {
 };
 
 export default CTA;
+

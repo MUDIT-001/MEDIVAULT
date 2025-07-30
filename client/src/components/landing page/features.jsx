@@ -4,32 +4,32 @@ const features = [
   {
     title: "Medical vault",
     description: "Securely store and access your government medical documents anytime, anywhere.",
-    image: "/11.png",
+    image: "/11.jpeg",
   },
   {
     title: "Hosp record switch",
     description: "Access complete medical history instantly through a secure Patient ID—no repeats, no delays.",
-    image: "/12.png",
+    image: "/12.jpeg",
   },
   {
     title: "Mental Health Chatbot",
     description: "24/7 AI chatbot for mood tracking, self-care, and compassionate mental health support.",
-    image: "/13.png",
+    image: "/13.jpeg",
   },
   {
     title: "Symptom Checker, diet planner",
     description: "AI-powered symptom checker with instant, personalized diet plans for smarter healing.",
-    image: "/14.png",
+    image: "/14.jpeg",
   },
   {
     title: "Caregiver & Family Access",
     description: "MediVault lets caregivers securely view records and updates, keeping your loved ones informed and involved in your care.",
-    image: "/placeholder.png",
+    image: "/caregiver.jpg",
   },
   {
     title: "Dashboard Insights",
     description: "MediVault’s Dashboard shows clear graphs and charts of your health trends, helping you track progress and make informed decisions easily.",
-    image: "/placeholder.png",
+    image: "/dashboard.jpg",
   },
 ];
 

@@ -16,13 +16,22 @@ const Footer = () => {
         {/* Left Section */}
         <div className="max-w-[30%]">
           <img
-            src="/logo.png"
+            src="/logo1.png"
             alt="MediVault Logo"
             className="mb-4 w-[160px]"
           />
-          <p className="text-gray-400 text-sm mb-4">
-            Empowering digital healthcare with secure and connected solutions.
+          <p className="text-gray-400 text-sm mb-2">
+  Empowering digital healthcare with secure and connected solutions.
+</p>
+<p className="text-gray-400 text-sm mb-2">
+  📞 <span className="font-semibold">Contact:</span> +91 9876543210
+</p>
+{/* Email Section */}
+          <p className="text-gray-400 text-sm mb-2">
+            📧 <span className="font-semibold"> Email:</span> info@medivault.com
           </p>
+          
+
           <div className="flex gap-4 text-xl text-white">
             <a href="https://instagram.com" target="_blank" rel="noreferrer">
               <FaInstagram />
